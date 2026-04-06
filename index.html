@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Widget Lunar Cottagecore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Tipografia manuscrita -->
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+/* -------------------------------------------------- */
+/* PALETA DA MARCA                                    */
+/* -------------------------------------------------- */
+:root {
+  --roxo: #8b698e;
+  --verde: #6c724d;
+  --dourado: #c9a86a;
+  --bege: #e8dcc2;
+  --cinza: #d9d9d9;
+  --grafite: #403c39;
+}
+
+/* -------------------------------------------------- */
+/* RESET                                               */
+/* -------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* -------------------------------------------------- */
+/* BODY + MODO DIA/NOITE                               */
+/* -------------------------------------------------- */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: var(--bege);
+  color: var(--grafite);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  transition: background 1s ease, color 1s ease;
+}
+
+body.night {
+  background: #2b2624;
+  color: var(--bege);
+}
+
+/* -------------------------------------------------- */
+/* WIDGET                                              */
+/* -------------------------------------------------- */
+.widget {
+  width: 360px;
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(6px);
+  border-radius: 22px;
+  padding: 22px;
+  border: 1px solid rgba(64,60,57,0.15);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+}
+
+body.night .widget {
+  background: rgba(64,60,57,0.4);
+  border-color: rgba(255,255,255,0.1);
+}
+
+/* -------------------------------------------------- */
+/* ESTRELAS                                            */
+/* -------------------------------------------------- */
+.star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--dourado);
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: twinkle 3s infinite ease-in-out alternate;
+}
+
+@keyframes twinkle {
+  from { opacity: 0.2; transform: scale(0.8); }
+  to   { opacity: 1;   transform: scale(1.3); }
+}
+
+/* -------------------------------------------------- */
+/* NEBLINA (modo noite)                                */
+/* -------------------------------------------------- */
+.fog {
+  position: absolute;
+  inset: 0;
+  background: url('data:image/svg+xml;utf8,\
+  <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">\
+  <filter id="noise">\
+  <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3"/>\
+  </filter>\
+  <rect width="100%" height="100%" filter="url(%23noise)" opacity="0.12"/>\
+  </svg>');
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  animation: fogMove 18s infinite linear;
+  pointer-events: none;
+}
+
+body.night .fog {
+  opacity: 0.25;
+}
+
+@keyframes fogMove {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-120px); }
+}
+
+/* -------------------------------------------------- */
+/* RAMINHOS BOTÂNICOS                                  */
+/* -------------------------------------------------- */
+.branch {
+  position: absolute;
+  width: 150px;
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.branch.top {
+  top: -10px;
+  left: -10px;
+  transform: rotate(-12deg);
+}
+
+.branch.bottom {
+  bottom: -10px;
+  right: -10px;
+  transform: rotate(12deg);
+}
+
+.branch svg path {
+  stroke: var(--verde);
+  stroke-width: 2;
+  fill: none;
+}
+
+/* -------------------------------------------------- */
+/* TÍTULOS                                             */
+/* -------------------------------------------------- */
+.hand {
+  font-family: "Kalam", cursive;
+}
+
+.title {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 12px;
+}
+
+/* -------------------------------------------------- */
+/* CANVAS DA LUA                                       */
+/* -------------------------------------------------- */
+.canvas-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+canvas {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+}
+
+/* -------------------------------------------------- */
+/* INFO                                                */
+/* -------------------------------------------------- */
+.info {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.phase {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.illum {
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.date {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* -------------------------------------------------- */
+/* BOTÃO DO MODAL                                      */
+/* -------------------------------------------------- */
+.modal-btn {
+  margin-top: 14px;
+  display: inline-block;
+  padding: 8px 14px;
+  background: var(--roxo);
+  color: white;
+  border-radius: 10px;
+  font-family: "Kalam", cursive;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.modal-btn:hover {
+  background: #7a5c7d;
+}
+
+/* -------------------------------------------------- */
+/* MODAL FLUTUANTE                                     */
+/* -------------------------------------------------- */
+.modal-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.modal-bg.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  transform: translate(-50%, -50%) scale(0.95);
+  background: rgba(255,255,255,0.85);
+  border-radius: 20px;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+}
+
+body.night .modal {
+  background: rgba(64,60,57,0.85);
+}
+
+.modal.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* -------------------------------------------------- */
+/* CALENDÁRIO                                          */
+/* -------------------------------------------------- */
+.calendar-title {
+  font-family: "Kalam", cursive;
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.day {
+  text-align: center;
+  font-size: 12px;
+}
+
+.day canvas {
+  width: 40px;
+  height: 40px;
+}
+
+/* -------------------------------------------------- */
+/* BOTÃO FECHAR                                        */
+/* -------------------------------------------------- */
+.close-btn {
+  margin-top: 16px;
+  display: block;
+  text-align: center;
+  padding: 8px 14px;
+  background: var(--verde);
+  color: white;
+  border-radius: 10px;
+  font-family: "Kalam", cursive;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.close-btn:hover {
+  background: #5a623f;
+}
+</style>
+</head>
+
+<body>
+
+<div class="widget">
+
+  <!-- Neblina -->
+  <div class="fog"></div>
+
+  <!-- Estrelas -->
+  <div class="star" style="top:20px; left:40px;"></div>
+  <div class="star" style="top:60px; left:260px;"></div>
+  <div class="star" style="top:140px; left:80px;"></div>
+  <div class="star" style="top:200px; left:200px;"></div>
+
+  <!-- Raminhos -->
+  <div class="branch top">
+    <svg viewBox="0 0 100 100">
+      <path d="M10 90 C30 70, 40 40, 80 10" />
+    </svg>
+  </div>
+
+  <div class="branch bottom">
+    <svg viewBox="0 0 100 100">
+      <path d="M10 10 C40 40, 60 70, 90 90" />
+    </svg>
+  </div>
+
+  <!-- Conteúdo -->
+  <div class="title hand">Fase da Lua</div>
+  <div class="subtitle hand">Céu do Brasil agora</div>
+
+  <div class="canvas-wrapper">
+    <canvas id="moonCanvas" width="300" height="300"></canvas>
+  </div>
+
+  <div class="info">
+    <div class="phase hand" id="phaseName">Carregando...</div>
+    <div class="illum" id="illumination"></div>
+    <div class="date" id="dateLabel"></div>
+  </div>
+
+  <div class="modal-btn" id="openModal">Ver calendário lunar</div>
+
+  <!-- Modal -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal" id="modal">
+      <div class="calendar-title">Calendário Lunar</div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+      <div class="close-btn" id="closeModal">Fechar</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* -------------------------------------------------- */
+/* MODO DIA/NOITE                                      */
+/* -------------------------------------------------- */
+(function setDayNight() {
+  const hour = new Date().getHours();
+  if (hour >= 18 || hour < 6) {
+    document.body.classList.add("night");
+  }
+})();
+
+/* -------------------------------------------------- */
+/* CÁLCULO DA FASE DA LUA                              */
+/* -------------------------------------------------- */
+function getMoonPhase(date) {
+  const synodic = 29.53058867;
+  const base = Date.UTC(2000,0,6,18,14);
+  const now = date.getTime();
+  const days = (now - base) / 86400000;
+  const age = (days % synodic + synodic) % synodic;
+  const phase = age / synodic;
+  const illum = (1 - Math.cos(2 * Math.PI * phase)) / 2;
+
+  let name = "";
+  if (phase < 0.03 || phase > 0.97) name = "Lua Nova";
+  else if (phase < 0.22) name = "Lua Crescente";
+  else if (phase < 0.28) name = "Quarto Crescente";
+  else if (phase < 0.47) name = "Gibosa Crescente";
+  else if (phase < 0.53) name = "Lua Cheia";
+  else if (phase < 0.72) name = "Gibosa Minguante";
+  else if (phase < 0.78) name = "Quarto Minguante";
+  else name = "Lua Minguante";
+
+  return { phase, illum, name };
+}
+
+/* -------------------------------------------------- */
+/* DESENHO DA LUA + ANIMAÇÃO                           */
+/* -------------------------------------------------- */
+let rotation = 0;
+
+function drawMoon(phase, illum) {
+  const canvas = document.getElementById("moonCanvas");
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width;
+  const h = canvas.height;
+  const r = 120;
+  const cx = w/2;
+  const cy = h/2;
+
+  ctx.clearRect(0,0,w,h);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rotation);
+  ctx.translate(-cx, -cy);
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.fillStyle = "#fdf7ec";
+  ctx.fill();
+
+  ctx.globalCompositeOperation = "source-atop";
+  ctx.fillStyle = "#403c39";
+
+  const waxing = phase <= 0.5;
+  const k = Math.abs(0.5 - phase) * 2;
+  const offset = r * (1 - k);
+  const xOffset = waxing ? -offset : offset;
+
+  ctx.beginPath();
+  ctx.ellipse(cx + xOffset, cy, r, r, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+
+  rotation += 0.0008;
+  requestAnimationFrame(() => drawMoon(phase, illum));
+}
+
+/* -------------------------------------------------- */
+/* CALENDÁRIO LUNAR                                    */
+/* -------------------------------------------------- */
+function drawMiniMoon(canvas, phase) {
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width;
+  const h = canvas.height;
+  const r = 18;
+  const cx = w/2;
+  const cy = h/2;
+
+  ctx.clearRect(0,0,w,h);
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.fillStyle = "#fdf7ec";
+  ctx.fill();
+
+  ctx.globalCompositeOperation = "source-atop";
+  ctx.fillStyle = "#403c39";
+
+  const waxing = phase <= 0.5;
+  const k = Math.abs(0.5 - phase) * 2;
+  const offset = r * (1 - k);
+  const xOffset = waxing ? -offset : offset;
+
+  ctx.beginPath();
+  ctx.ellipse(cx + xOffset, cy, r, r, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.globalCompositeOperation = "source-over";
+}
+
+function generateCalendar() {
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+
+    const { phase } = getMoonPhase(date);
+
+    const day = document.createElement("div");
+    day.className = "day";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 80;
+    canvas.height = 80;
+
+    drawMiniMoon(canvas, phase);
+
+    const label = document.createElement("div");
+    label.textContent = date.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit" });
+
+    day.appendChild(canvas);
+    day.appendChild(label);
+    grid.appendChild(day);
+  }
+}
+
+/* -------------------------------------------------- */
+/* MODAL                                               */
+/* -------------------------------------------------- */
+const modalBg = document.getElementById("modalBg");
+const modal = document.getElementById("modal");
+const openModal = document.getElementById("openModal");
+const closeModal = document.getElementById("closeModal");
+
+openModal.onclick = () => {
+  modalBg.classList.add("active");
+  modal.classList.add("active");
+  generateCalendar();
+};
+
+closeModal.onclick = () => {
+  modalBg.classList.remove("active");
+  modal.classList.remove("active");
+};
+
+/* -------------------------------------------------- */
+/* INICIALIZAÇÃO                                        */
+/* -------------------------------------------------- */
+(function init() {
+  const now = new Date();
+  const data = getMoonPhase(now);
+
+  document.getElementById("phaseName").textContent = data.name;
+  document.getElementById("illumination").textContent =
+    Math.round(data.illum * 100) + "% iluminada";
+  document.getElementById("dateLabel").textContent =
+    now.toLocaleDateString("pt-BR", { weekday:"long", day:"2-digit", month:"long" });
+
+  drawMoon(data.phase, data.illum);
+})();
+</script>
+
+</body>
+</html>
