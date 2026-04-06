@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fase da Lua - Brasil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --roxo: #8b698e;
+      --verde: #6c724d;
+      --dourado: #c9a86a;
+      --bege: #e8dcc2;
+      --cinza-claro: #d9d9d9;
+      --grafite: #403c39;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bege);
+      color: var(--grafite);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .widget {
+      width: 320px;
+      max-width: 100%;
+      background: linear-gradient(145deg, var(--bege), #f5efe0);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      box-shadow:
+        0 18px 35px rgba(64, 60, 57, 0.18),
+        0 0 0 1px rgba(64, 60, 57, 0.06);
+      border: 1px solid rgba(64, 60, 57, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .widget::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(139, 105, 142, 0.12) 0, transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(108, 114, 77, 0.12) 0, transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .widget-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title {
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grafite);
+      opacity: 0.8;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--roxo);
+      opacity: 0.9;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(108, 114, 77, 0.08);
+      color: var(--verde);
+      border: 1px solid rgba(108, 114, 77, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--verde);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.1fr 1.2fr;
+      gap: 10px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .moon-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffffff, #f3e7d5);
+      box-shadow:
+        0 0 0 1px rgba(64, 60, 57, 0.08),
+        0 12px 25px rgba(64, 60, 57, 0.25);
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .phase-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--grafite);
+    }
+
+    .phase-label {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(64, 60, 57, 0.7);
+    }
+
+    .date {
+      font-size: 12px;
+      color: rgba(64, 60, 57, 0.8);
+    }
+
+    .progress-bar {
+      margin-top: 4px;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(64, 60, 57, 0.08);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--roxo), var(--dourado));
+      width: 0%;
+      transition: width 0.6s ease-out;
+    }
+
+    .footer {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: rgba(64, 60, 57, 0.7);
+    }
+
+    .footer span {
+      opacity: 0.9;
+    }
+
+    .tiny-ornament {
+      font-size: 11px;
+      color: var(--roxo);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="widget-inner">
+      <div class="header">
+        <div class="title-block">
+          <div class="title">Fase atual da Lua</div>
+          <div class="subtitle">Céu do Brasil, agora</div>
+        </div>
+        <div class="pill">
+          <span class="pill-dot"></span>
+          <span id="illumination-label">--% iluminada</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="moon-wrapper">
+          <canvas id="moonCanvas" width="240" height="240"></canvas>
+        </div>
+        <div class="info">
+          <div class="phase-label">Fase</div>
+          <div class="phase-name" id="phase-name">Carregando...</div>
+          <div class="date" id="date-label"></div>
+
+          <div class="phase-label" style="margin-top: 8px;">Ciclo lunar</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>sincronia suave com o céu</span>
+        <span class="tiny-ornament">✶ cottage moon ✶</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Algoritmo simples para fase da Lua (aproximação)
+    function getMoonPhaseData(date) {
+      // Base: 6 jan 2000 18:14 UTC (referência comum)
+      const synodicMonth = 29.53058867; // dias
+      const base = Date.UTC(2000, 0, 6, 18, 14, 0);
+      const nowUTC = Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds()
+      );
+
+      const daysSince = (nowUTC - base) / 86400000;
+      const moonAge = (daysSince % synodicMonth + synodicMonth) % synodicMonth;
+      const phase = moonAge / synodicMonth; // 0–1
+      const illumination = (1 - Math.cos(2 * Math.PI * phase)) / 2; // 0–1
+
+      let phaseName = "";
+      if (phase < 0.03 || phase > 0.97) {
+        phaseName = "Lua Nova";
+      } else if (phase < 0.22) {
+        phaseName = "Lua Crescente";
+      } else if (phase < 0.28) {
+        phaseName = "Quarto Crescente";
+      } else if (phase < 0.47) {
+        phaseName = "Gibosa Crescente";
+      } else if (phase < 0.53) {
+        phaseName = "Lua Cheia";
+      } else if (phase < 0.72) {
+        phaseName = "Gibosa Minguante";
+      } else if (phase < 0.78) {
+        phaseName = "Quarto Minguante";
+      } else {
+        phaseName = "Lua Minguante";
+      }
+
+      return {
+        phase,          // 0–1
+        illumination,   // 0–1
+        phaseName,
+        moonAge
+      };
+    }
+
+    function drawMoon(phase, illumination) {
+      const canvas = document.getElementById("moonCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+      const r = Math.min(w, h) * 0.4;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Fundo "céu"
+      const skyGradient = ctx.createRadialGradient(
+        cx, cy, r * 0.2,
+        cx, cy, r * 1.4
+      );
+      skyGradient.addColorStop(0, "#f5efe0");
+      skyGradient.addColorStop(1, "#d3c5aa");
+      ctx.fillStyle = skyGradient;
+      ctx.fillRect(0, 0, w, h);
+
+      // Lua base (disco)
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.fillStyle = "#fdf7ec";
+      ctx.fill();
+
+      // Textura suave
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = "#e0d2bd";
+      for (let i = 0; i < 12; i++) {
+        const angle = (Math.PI * 2 * i) / 12;
+        const cr = r * 0.18;
+        const tx = cx + Math.cos(angle) * r * 0.4;
+        const ty = cy + Math.sin(angle) * r * 0.35;
+        ctx.beginPath();
+        ctx.ellipse(tx, ty, cr * 0.9, cr * 0.7, angle, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // Sombra da fase
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 0.5, 0, Math.PI * 2);
+      ctx.clip();
+
+      const waxing = phase <= 0.5;
+      const k = Math.abs(0.5 - phase) * 2; // 0 no quarto, 1 em nova/cheia
+
+      ctx.fillStyle = "#403c39";
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 1, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+
+      const offset = r * (1 - k);
+      const xOffset = waxing ? -offset : offset;
+
+      ctx.ellipse(
+        cx + xOffset,
+        cy,
+        r,
+        r,
+        0,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      ctx.restore();
+      ctx.restore();
+
+      // Borda suave
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(64, 60, 57, 0.25)";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+
+    function formatDateBrazil(date) {
+      return date.toLocaleDateString("pt-BR", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      });
+    }
+
+    function initMoonWidget() {
+      // Considera horário local do navegador (Brasil, no seu caso)
+      const now = new Date();
+      const data = getMoonPhaseData(now);
+
+      const phaseNameEl = document.getElementById("phase-name");
+      const dateLabelEl = document.getElementById("date-label");
+      const illumLabelEl = document.getElementById("illumination-label");
+      const progressFillEl = document.getElementById("progress-fill");
+
+      phaseNameEl.textContent = data.phaseName;
+      dateLabelEl.textContent = formatDateBrazil(now);
+      const illumPercent = Math.round(data.illumination * 100);
+      illumLabelEl.textContent = illumPercent + "% iluminada";
+
+      const progressPercent = (data.moonAge / 29.53058867) * 100;
+      progressFillEl.style.width = progressPercent.toFixed(1) + "%";
+
+      drawMoon(data.phase, data.illumination);
+    }
+
+    document.addEventListener("DOMContentLoaded", initMoonWidget);
+  </script>
+</body>
+</html>
