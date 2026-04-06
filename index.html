@@ -5,7 +5,7 @@
 <title>Widget Lunar Cottagecore</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Tipografia manuscrita -->
+<!-- Fonte manuscrita (fallback até EFCO Brookshire) -->
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
 
 <style>
@@ -31,26 +31,25 @@
 }
 
 /* -------------------------------------------------- */
-/* BODY + MODO DIA/NOITE                               */
+/* BODY TRANSPARENTE                                   */
 /* -------------------------------------------------- */
 body {
   font-family: "Segoe UI", sans-serif;
-  background: transparent;
+  background: transparent !important;
   color: var(--grafite);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  transition: background 1s ease, color 1s ease;
 }
 
 body.night {
-  background: #2b2624;
+  background: transparent !important;
   color: var(--bege);
 }
 
 /* -------------------------------------------------- */
-/* WIDGET                                              */
+/* WIDGET COM JANELA ARREDONDADA                       */
 /* -------------------------------------------------- */
 .widget {
   width: 360px;
@@ -61,6 +60,7 @@ body.night {
   border: 1px solid rgba(64,60,57,0.15);
   position: relative;
   overflow: hidden;
+  text-align: center;
   box-shadow: 0 12px 28px rgba(0,0,0,0.18);
 }
 
@@ -70,7 +70,7 @@ body.night .widget {
 }
 
 /* -------------------------------------------------- */
-/* ESTRELAS                                            */
+/* ESTRELAS DECORATIVAS                                */
 /* -------------------------------------------------- */
 .star {
   position: absolute;
@@ -116,49 +116,18 @@ body.night .fog {
 }
 
 /* -------------------------------------------------- */
-/* RAMINHOS BOTÂNICOS                                  */
+/* TIPOGRAFIA MANUSCRITA                               */
 /* -------------------------------------------------- */
-.branch {
-  position: absolute;
-  width: 150px;
-  opacity: 0.22;
-  pointer-events: none;
-}
-
-.branch.top {
-  top: -10px;
-  left: -10px;
-  transform: rotate(-12deg);
-}
-
-.branch.bottom {
-  bottom: -10px;
-  right: -10px;
-  transform: rotate(12deg);
-}
-
-.branch svg path {
-  stroke: var(--verde);
-  stroke-width: 2;
-  fill: none;
+.hand {
+  font-family: 'Pirata One', cursive;
 }
 
 /* -------------------------------------------------- */
 /* TÍTULOS                                             */
 /* -------------------------------------------------- */
-.hand {
-  font-family: "Kalam", cursive;
-}
-
 .title {
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-
-.subtitle {
-  font-size: 13px;
-  opacity: 0.8;
-  margin-bottom: 12px;
+  font-size: 32px;
+  margin-bottom: 10px;
 }
 
 /* -------------------------------------------------- */
@@ -185,7 +154,7 @@ canvas {
 }
 
 .phase {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
 }
 
@@ -205,16 +174,18 @@ canvas {
 /* BOTÃO DO MODAL                                      */
 /* -------------------------------------------------- */
 .modal-btn {
-  margin-top: 14px;
-  display: inline-block;
-  padding: 8px 14px;
+  margin-top: 18px;
+  display: block;
+  padding: 10px 18px;
   background: var(--roxo);
   color: white;
   border-radius: 10px;
-  font-family: "Kalam", cursive;
+  font-family: 'Pirata One', cursive;
   cursor: pointer;
-  font-size: 14px;
-  transition: background 0.3s;
+  font-size: 18px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .modal-btn:hover {
@@ -266,8 +237,8 @@ body.night .modal {
 /* CALENDÁRIO                                          */
 /* -------------------------------------------------- */
 .calendar-title {
-  font-family: "Kalam", cursive;
-  font-size: 22px;
+  font-family: 'Pirata One', cursive;
+  font-size: 26px;
   text-align: center;
   margin-bottom: 12px;
 }
@@ -299,9 +270,12 @@ body.night .modal {
   background: var(--verde);
   color: white;
   border-radius: 10px;
-  font-family: "Kalam", cursive;
+  font-family: 'Pirata One', cursive;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .close-btn:hover {
@@ -323,22 +297,8 @@ body.night .modal {
   <div class="star" style="top:140px; left:80px;"></div>
   <div class="star" style="top:200px; left:200px;"></div>
 
-  <!-- Raminhos -->
-  <div class="branch top">
-    <svg viewBox="0 0 100 100">
-      <path d="M10 90 C30 70, 40 40, 80 10" />
-    </svg>
-  </div>
-
-  <div class="branch bottom">
-    <svg viewBox="0 0 100 100">
-      <path d="M10 10 C40 40, 60 70, 90 90" />
-    </svg>
-  </div>
-
   <!-- Conteúdo -->
-  <center>
-  <div class="title hand">Fase da Lua</div></center>
+  <div class="title hand">Fases da Lua</div>
 
   <div class="canvas-wrapper">
     <canvas id="moonCanvas" width="300" height="300"></canvas>
@@ -349,15 +309,15 @@ body.night .modal {
     <div class="illum" id="illumination"></div>
     <div class="date" id="dateLabel"></div>
   </div>
-<center>
-  <div class="modal-btn" id="openModal">Ver calendário lunar</div></center>
+
+  <div class="modal-btn hand" id="openModal">Ver calendário</div>
 
   <!-- Modal -->
   <div class="modal-bg" id="modalBg">
     <div class="modal" id="modal">
       <div class="calendar-title">Calendário Lunar</div>
       <div class="calendar-grid" id="calendarGrid"></div>
-      <div class="close-btn" id="closeModal">Fechar</div>
+      <div class="close-btn hand" id="closeModal">Fechar</div>
     </div>
   </div>
 
